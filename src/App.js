@@ -10,7 +10,26 @@ function App() {
 
   const [query, setQuery] = React.useState("")
   const [weather, setWeather] = React.useState({})
+  const [currentLocation, setCurrentLocation] = React.useState("")
 
+  //get user location data
+  React.useEffect(() => {
+    fetch("https://geolocation-db.com/json/")
+      .then(res => res.json())
+      .then(data => setCurrentLocation(data.country_name))
+  }, [])
+
+  //display weather from user location
+  React.useEffect(() => {
+    fetch(`${api.base}weather?q=${currentLocation}&units=metric&APPID=${api.key}`)
+      .then(res => res.json())
+      .then(result => {
+        setWeather(result)
+        setQuery("")
+    })
+  }, [currentLocation])
+
+  //display weather on "Enter" press
   const search = event => {
     if (event.key === "Enter") {
       fetch(`${api.base}weather?q=${query}&units=metric&APPID=${api.key}`)
@@ -18,18 +37,11 @@ function App() {
         .then(result => {
           setWeather(result)
           setQuery("")
-          console.log(result)
         })
     }
   }
 
-  /*React.useEffect(() => {
-    fetch("http://api.openweathermap.org/data/2.5/weather?q=lausanne&uniti=metric&APIID=5f826a580f1290aece38d4df9e0499eb")
-      .then(res => res.json())
-      .then(results => weatherResults = results)
-  }, [])*/
-
-
+  //build current-date component
   const dateBuilder = (d) => {
     let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
     let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
